@@ -3,7 +3,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 
 import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
 
-export const ROUTER_ADDRESS = '0x26b368C3Ed16313eBd6660b72d8e4439a697Cb0B'
+export const ROUTER_ADDRESS = '0x5fE58d975604E6aF62328d9E505181B94Fc0718C'
 
 // a list of tokens by chain
 type ChainTokenList = {
@@ -16,13 +16,13 @@ export enum ChainId {
   TESTNET = 25223
 }
 
-export const USDT = new Token(ChainId.TESTNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 6, 'USDT', 'Tether USD')
-export const USDC = new Token(ChainId.TESTNET as any, '0xf2FcC18ED5072b48C0a076693eCa72fE840b3981', 6, 'USDC', 'USDC')
+export const USDT = new Token(ChainId.TESTNET as any, '0x65C899B5fb8Eb9ae4da51D67E1fc417c7CB7e964', 6, 'USDT', 'Tether USD')
+export const USDC = new Token(ChainId.TESTNET as any, '0x0a67078A35745947A37A552174aFe724D8180c25', 6, 'USDC', 'USDC')
 
 export const WBTC = {
-  [ChainId.MAINNET]: new Token(ChainId.MAINNET as any, '0x111C3E89Ce80e62EE88318C2804920D4c96f92bb', 18, 'WBTC', 'Wrapped Bitcoin'),
-  [ChainId.TESTNET]: new Token(ChainId.TESTNET as any, '0x111C3E89Ce80e62EE88318C2804920D4c96f92bb', 18, 'WBTC', 'Wrapped Bitcoin'),
-  "1": new Token(ChainId.TESTNET as any, '0x111C3E89Ce80e62EE88318C2804920D4c96f92bb', 18, 'WBTC', 'Wrapped Bitcoin')
+  [ChainId.MAINNET]: new Token(ChainId.MAINNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 18, 'WBTC', 'Wrapped Bitcoin'),
+  [ChainId.TESTNET]: new Token(ChainId.TESTNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 18, 'WBTC', 'Wrapped Bitcoin'),
+  "1": new Token(ChainId.TESTNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 18, 'WBTC', 'Wrapped Bitcoin')
 }
 
 const WBTC_ONLY: ChainTokenList = {
