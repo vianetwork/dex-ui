@@ -135,7 +135,6 @@ export function useSwapCallback(
   const { account, chainId, library } = useActiveWeb3React()
 
   const swapCalls = useSwapCallArguments(trade, allowedSlippage, deadline, recipientAddressOrName)
-  console.log(swapCalls)
 
   const addTransaction = useTransactionAdder()
 
@@ -166,11 +165,6 @@ export function useSwapCallback(
               contract
             } = call
             const options = !value || isZero(value) ? {} : { value }
-            console.log(args)
-            // const args2: any = [...args];
-            // args2[1][0] = WBTC[1].address;
-            // console.log({methodName})
-            // console.log({args})
             return contract.estimateGas[methodName](...args, options)
               .then(gasEstimate => {
                 return {

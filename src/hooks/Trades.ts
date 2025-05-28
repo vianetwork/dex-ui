@@ -18,8 +18,6 @@ function useAllCommonPairs(currencyA?: Currency, currencyB?: Currency): Pair[] {
     ? [wrappedCurrency(currencyA, chainId), wrappedCurrency(currencyB, chainId)]
     : [undefined, undefined]
 
-  // console.log({tokenA, tokenB})
-
   const basePairs: [Token, Token][] = useMemo(
     () =>
       flatMap(bases, (base): [Token, Token][] => bases.map(otherBase => [base, otherBase])).filter(
@@ -145,7 +143,6 @@ export function useTradeExactOut(currencyIn?: Currency, currencyAmountOut?: Curr
     //   const original = Trade.bestTradeExactOut(allowedPairs, currencyIn, currencyAmountOut, { maxHops: 3, maxNumResults: 1 })[0] ??
     //     null;
     //   const obj = classToObject(original)
-    //   console.log({original})
     //   if (oldCurrencyIn.symbol == "ETH" || oldCurrencyIn.symbol == "BTC") {
     //     obj.inputAmount.currency = oldCurrencyIn;
     //     obj.outputAmount.token = oldCurrencyIn;
