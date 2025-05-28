@@ -85,8 +85,8 @@
     "@walletconnect/web3-provider": "1.1.1-alpha.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
@@ -109,5 +109,8 @@
   },
   "dependencies": {
     "bigint-isqrt": "^0.3.2"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
