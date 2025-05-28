@@ -1,4 +1,4 @@
-import { Currency, CurrencyAmount, ETHER, JSBI, Pair, Percent, Price, TokenAmount } from '@uniswap/sdk'
+import { Currency, CurrencyAmount, ETHER, InsufficientInputAmountError, JSBI, MINIMUM_LIQUIDITY, Pair, Percent, Price, TokenAmount } from '@uniswap/sdk'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { PairState, usePair } from '../../data/Reserves'
@@ -11,6 +11,7 @@ import { tryParseAmount } from '../swap/hooks'
 import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, typeInput } from './actions'
 import { toV2LiquidityToken } from '../user/hooks'
+import { sqrt } from '../../utils/math'
 
 const ZERO = JSBI.BigInt(0)
 
@@ -118,7 +119,21 @@ export function useDerivedMintInfo(
       wrappedCurrencyAmount(currencyBAmount, chainId)
     ]
     if (pair && totalSupply && tokenAmountA && tokenAmountB) {
-      return pair.getLiquidityMinted(totalSupply, tokenAmountA, tokenAmountB)
+      var tokenAmounts = tokenAmountA.token.sortsBefore(tokenAmountB.token) // does safety checks
+        ? [tokenAmountA, tokenAmountB] : [tokenAmountB, tokenAmountA];
+
+      let liquidity;
+      if (totalSupply.raw > ZERO) {
+        liquidity = JSBI.subtract(sqrt(JSBI.multiply(tokenAmounts[0].raw, tokenAmounts[1].raw)), MINIMUM_LIQUIDITY);
+      } else {
+        var amount0 = JSBI.divide(JSBI.multiply(tokenAmounts[0].raw, totalSupply.raw), pair.reserve0.raw);
+        var amount1 = JSBI.divide(JSBI.multiply(tokenAmounts[1].raw, totalSupply.raw), pair.reserve1.raw);
+        liquidity = JSBI.lessThanOrEqual(amount0, amount1) ? amount0 : amount1;
+      }
+      if (!JSBI.greaterThan(liquidity, ZERO)) {
+        throw new InsufficientInputAmountError();
+      }
+      return new TokenAmount(liquidityToken!, liquidity);
     } else {
       return undefined
     }
