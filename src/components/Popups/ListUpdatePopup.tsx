@@ -11,6 +11,7 @@ import listVersionLabel from '../../utils/listVersionLabel'
 import { ButtonSecondary } from '../Button'
 import { AutoColumn } from '../Column'
 import { AutoRow } from '../Row'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 export default function ListUpdatePopup({
   popKey,
@@ -69,7 +70,7 @@ export default function ListUpdatePopup({
                   <li>
                     {tokensAdded.map((token, i) => (
                       <React.Fragment key={`${token.chainId}-${token.address}`}>
-                        <strong title={token.address}>{token.symbol}</strong>
+                        <strong title={token.address}>{tryCastSymbolToBTC(token.symbol)}</strong>
                         {i === tokensAdded.length - 1 ? null : ', '}
                       </React.Fragment>
                     ))}{' '}
@@ -80,7 +81,7 @@ export default function ListUpdatePopup({
                   <li>
                     {tokensRemoved.map((token, i) => (
                       <React.Fragment key={`${token.chainId}-${token.address}`}>
-                        <strong title={token.address}>{token.symbol}</strong>
+                        <strong title={token.address}>{tryCastSymbolToBTC(token.symbol)}</strong>
                         {i === tokensRemoved.length - 1 ? null : ', '}
                       </React.Fragment>
                     ))}{' '}

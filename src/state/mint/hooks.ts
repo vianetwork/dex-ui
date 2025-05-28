@@ -12,6 +12,7 @@ import { useCurrencyBalances } from '../wallet/hooks'
 import { Field, typeInput } from './actions'
 import { toV2LiquidityToken } from '../user/hooks'
 import { sqrt } from '../../utils/math'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 const ZERO = JSBI.BigInt(0)
 
@@ -163,11 +164,11 @@ export function useDerivedMintInfo(
   const { [Field.CURRENCY_A]: currencyAAmount, [Field.CURRENCY_B]: currencyBAmount } = parsedAmounts
 
   if (currencyAAmount && currencyBalances?.[Field.CURRENCY_A]?.lessThan(currencyAAmount)) {
-    error = 'Insufficient ' + currencies[Field.CURRENCY_A]?.symbol + ' balance'
+    error = 'Insufficient ' + tryCastSymbolToBTC(currencies[Field.CURRENCY_A]?.symbol!) + ' balance'
   }
 
   if (currencyBAmount && currencyBalances?.[Field.CURRENCY_B]?.lessThan(currencyBAmount)) {
-    error = 'Insufficient ' + currencies[Field.CURRENCY_B]?.symbol + ' balance'
+    error = 'Insufficient ' + tryCastSymbolToBTC(currencies[Field.CURRENCY_B]?.symbol!) + ' balance'
   }
 
   return {

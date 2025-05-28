@@ -41,6 +41,7 @@ import { Field } from '../../state/burn/actions'
 import { useWalletModalToggle } from '../../state/application/hooks'
 import { toV2LiquidityToken, useUserDeadline, useUserSlippageTolerance } from '../../state/user/hooks'
 import { BigNumber } from '@ethersproject/bignumber'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 export default function RemoveLiquidity({
   history,
@@ -343,7 +344,7 @@ export default function RemoveLiquidity({
           <RowFixed gap="4px">
             <CurrencyLogo currency={currencyA} size={'24px'} />
             <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
-              {currencyA?.symbol}
+              {tryCastSymbolToBTC(currencyA?.symbol!)}
             </Text>
           </RowFixed>
         </RowBetween>
@@ -357,7 +358,7 @@ export default function RemoveLiquidity({
           <RowFixed gap="4px">
             <CurrencyLogo currency={currencyB} size={'24px'} />
             <Text fontSize={24} fontWeight={500} style={{ marginLeft: '10px' }}>
-              {currencyB?.symbol}
+              {tryCastSymbolToBTC(currencyB?.symbol!)}
             </Text>
           </RowFixed>
         </RowBetween>
@@ -375,7 +376,7 @@ export default function RemoveLiquidity({
       <>
         <RowBetween>
           <Text color={theme.text2} fontWeight={500} fontSize={16}>
-            {'UNI ' + currencyA?.symbol + '/' + currencyB?.symbol} Burned
+            {'UNI ' + tryCastSymbolToBTC(currencyA?.symbol!) + '/' + (currencyB?.symbol!)} Burned
           </Text>
           <RowFixed>
             <DoubleCurrencyLogo currency0={currencyA} currency1={currencyB} margin={true} />
@@ -391,13 +392,13 @@ export default function RemoveLiquidity({
                 Price
               </Text>
               <Text fontWeight={500} fontSize={16} color={theme.text1}>
-                1 {currencyA?.symbol} = {tokenA ? pair.priceOf(tokenA).toSignificant(6) : '-'} {currencyB?.symbol}
+                1 {tryCastSymbolToBTC(currencyA?.symbol!)} = {tokenA ? pair.priceOf(tokenA).toSignificant(6) : '-'} {tryCastSymbolToBTC(currencyB?.symbol!)}
               </Text>
             </RowBetween>
             <RowBetween>
               <div />
               <Text fontWeight={500} fontSize={16} color={theme.text1}>
-                1 {currencyB?.symbol} = {tokenB ? pair.priceOf(tokenB).toSignificant(6) : '-'} {currencyA?.symbol}
+                1 {tryCastSymbolToBTC(currencyB?.symbol!)} = {tokenB ? pair.priceOf(tokenB).toSignificant(6) : '-'} {tryCastSymbolToBTC(currencyA?.symbol!)}
               </Text>
             </RowBetween>
           </>
@@ -538,7 +539,7 @@ export default function RemoveLiquidity({
                       <RowFixed>
                         <CurrencyLogo currency={currencyA} style={{ marginRight: '12px' }} />
                         <Text fontSize={24} fontWeight={500} id="remove-liquidity-tokena-symbol">
-                          {currencyA?.symbol}
+                          {tryCastSymbolToBTC(currencyA?.symbol!)}
                         </Text>
                       </RowFixed>
                     </RowBetween>
@@ -549,7 +550,7 @@ export default function RemoveLiquidity({
                       <RowFixed>
                         <CurrencyLogo currency={currencyB} style={{ marginRight: '12px' }} />
                         <Text fontSize={24} fontWeight={500} id="remove-liquidity-tokenb-symbol">
-                          {currencyB?.symbol}
+                          {tryCastSymbolToBTC(currencyB?.symbol!)}
                         </Text>
                       </RowFixed>
                     </RowBetween>
@@ -626,13 +627,13 @@ export default function RemoveLiquidity({
                 <RowBetween>
                   Price:
                   <div>
-                    1 {currencyA?.symbol} = {tokenA ? pair.priceOf(tokenA).toSignificant(6) : '-'} {currencyB?.symbol}
+                    1 {tryCastSymbolToBTC(currencyA?.symbol!)} = {tokenA ? pair.priceOf(tokenA).toSignificant(6) : '-'} {tryCastSymbolToBTC(currencyB?.symbol!)}
                   </div>
                 </RowBetween>
                 <RowBetween>
                   <div />
                   <div>
-                    1 {currencyB?.symbol} = {tokenB ? pair.priceOf(tokenB).toSignificant(6) : '-'} {currencyA?.symbol}
+                    1 {tryCastSymbolToBTC(currencyB?.symbol!)} = {tokenB ? pair.priceOf(tokenB).toSignificant(6) : '-'} {tryCastSymbolToBTC(currencyA?.symbol!)}
                   </div>
                 </RowBetween>
               </div>

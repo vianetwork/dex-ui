@@ -7,6 +7,7 @@ import { AutoRow } from '../../components/Row'
 import { ONE_BIPS } from '../../constants'
 import { Field } from '../../state/mint/actions'
 import { TYPE } from '../../theme'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 export function PoolPriceBar({
   currencies,
@@ -26,13 +27,13 @@ export function PoolPriceBar({
         <AutoColumn justify="center">
           <TYPE.black>{price?.toSignificant(6) ?? '-'}</TYPE.black>
           <Text fontWeight={500} fontSize={14} color={theme.text2} pt={1}>
-            {currencies[Field.CURRENCY_B]?.symbol} per {currencies[Field.CURRENCY_A]?.symbol}
+            {tryCastSymbolToBTC(currencies[Field.CURRENCY_B]?.symbol!)} per {tryCastSymbolToBTC(currencies[Field.CURRENCY_A]?.symbol!)}
           </Text>
         </AutoColumn>
         <AutoColumn justify="center">
           <TYPE.black>{price?.invert()?.toSignificant(6) ?? '-'}</TYPE.black>
           <Text fontWeight={500} fontSize={14} color={theme.text2} pt={1}>
-            {currencies[Field.CURRENCY_A]?.symbol} per {currencies[Field.CURRENCY_B]?.symbol}
+            {tryCastSymbolToBTC(currencies[Field.CURRENCY_A]?.symbol!)} per {tryCastSymbolToBTC(currencies[Field.CURRENCY_B]?.symbol!)}
           </Text>
         </AutoColumn>
         <AutoColumn justify="center">

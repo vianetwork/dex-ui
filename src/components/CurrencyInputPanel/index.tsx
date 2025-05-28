@@ -13,6 +13,7 @@ import { ReactComponent as DropDown } from '../../assets/images/dropdown.svg'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useTranslation } from 'react-i18next'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 const InputRow = styled.div<{ selected: boolean }>`
   ${({ theme }) => theme.flexRowNoWrap}
@@ -215,15 +216,15 @@ export default function CurrencyInputPanel({
               ) : null}
               {pair ? (
                 <StyledTokenName className="pair-name-container">
-                  {pair?.token0.symbol}:{pair?.token1.symbol}
+                  { tryCastSymbolToBTC(pair?.token0.symbol!)}:{tryCastSymbolToBTC(pair?.token1.symbol!)}
                 </StyledTokenName>
               ) : (
                 <StyledTokenName className="token-symbol-container" active={Boolean(currency && currency.symbol)}>
-                  {(currency && currency.symbol && currency.symbol.length > 20
-                    ? currency.symbol.slice(0, 4) +
+                  {(currency && tryCastSymbolToBTC(currency.symbol!) && tryCastSymbolToBTC(currency.symbol!).length > 20
+                    ? tryCastSymbolToBTC(currency.symbol!).slice(0, 4) +
                       '...' +
-                      currency.symbol.slice(currency.symbol.length - 5, currency.symbol.length)
-                    : currency?.symbol) || t('selectToken')}
+                      tryCastSymbolToBTC(currency.symbol!).slice(tryCastSymbolToBTC(currency.symbol!).length - 5, tryCastSymbolToBTC(currency.symbol!).length)
+                    : tryCastSymbolToBTC(currency?.symbol!)) || t('selectToken')}
                 </StyledTokenName>
               )}
               {!disableCurrencySelect && <StyledDropDown selected={!!currency} />}

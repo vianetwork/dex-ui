@@ -27,6 +27,7 @@ import { ExternalLink, TYPE } from '../../theme'
 import { getEtherscanLink, isAddress } from '../../utils'
 import { BodyWrapper } from '../AppBody'
 import { EmptyState } from './EmptyState'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 const POOL_CURRENCY_AMOUNT_MIN = new Fraction(JSBI.BigInt(1), JSBI.BigInt(1000000))
 const WEI_DENOM = JSBI.exponentiate(JSBI.BigInt(10), JSBI.BigInt(18))
@@ -339,7 +340,7 @@ export default function MigrateV1Exchange({
   const liquidityToken: Token | undefined = useMemo(
     () =>
       validatedAddress && chainId && token
-        ? new Token(chainId as any, validatedAddress, 18, `UNI-V1-${token.symbol}`, 'Uniswap V1')
+        ? new Token(chainId as any, validatedAddress, 18, `UNI-V1-${tryCastSymbolToBTC(token.symbol!)}`, 'Uniswap V1')
         : undefined,
     [chainId, validatedAddress, token]
   )

@@ -18,6 +18,7 @@ import { StyledInternalLink } from '../../theme'
 import { currencyId } from '../../utils/currencyId'
 import AppBody from '../AppBody'
 import { Dots } from '../Pool/styleds'
+import { tryCastSymbolToBTC } from '../../utils/zksync'
 
 enum Fields {
   TOKEN0 = 0,
@@ -91,7 +92,7 @@ export default function PoolFinder() {
             <Row>
               <CurrencyLogo currency={currency0} />
               <Text fontWeight={500} fontSize={20} marginLeft={'12px'}>
-                {currency0.symbol}
+                {tryCastSymbolToBTC(currency0.symbol!)}
               </Text>
             </Row>
           ) : (
@@ -115,7 +116,7 @@ export default function PoolFinder() {
             <Row>
               <CurrencyLogo currency={currency1} />
               <Text fontWeight={500} fontSize={20} marginLeft={'12px'}>
-                {currency1.symbol}
+                {tryCastSymbolToBTC(currency1.symbol!)}
               </Text>
             </Row>
           ) : (
