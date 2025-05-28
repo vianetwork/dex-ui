@@ -5,8 +5,8 @@ import useLast from '../../hooks/useLast'
 import { useSelectedListUrl } from '../../state/lists/hooks'
 import Modal from '../Modal'
 import { CurrencySearch } from './CurrencySearch'
-import ListIntroduction from './ListIntroduction'
-import { ListSelect } from './ListSelect'
+// import ListIntroduction from './ListIntroduction'
+// import { ListSelect } from './ListSelect'
 
 interface CurrencySearchModalProps {
   isOpen: boolean
@@ -25,8 +25,8 @@ export default function CurrencySearchModal({
   otherSelectedCurrency,
   showCommonBases = false
 }: CurrencySearchModalProps) {
-  const [listView, setListView] = useState<boolean>(false)
-  const lastOpen = useLast(isOpen)
+  const [listView, setListView] = useState<boolean>(true)
+  const lastOpen = useLast(true)
 
   useEffect(() => {
     if (isOpen && !lastOpen) {
@@ -49,23 +49,33 @@ export default function CurrencySearchModal({
     })
     setListView(true)
   }, [])
-  const handleClickBack = useCallback(() => {
-    ReactGA.event({
-      category: 'Lists',
-      action: 'Back'
-    })
-    setListView(false)
-  }, [])
-  const handleSelectListIntroduction = useCallback(() => {
-    setListView(true)
-  }, [])
+  // const handleClickBack = useCallback(() => {
+  //   ReactGA.event({
+  //     category: 'Lists',
+  //     action: 'Back'
+  //   })
+  //   setListView(false)
+  // }, [])
+  // const handleSelectListIntroduction = useCallback(() => {
+  //   setListView(true)
+  // }, [])
 
   const selectedListUrl = useSelectedListUrl()
   const noListSelected = !selectedListUrl
 
   return (
     <Modal isOpen={isOpen} onDismiss={onDismiss} maxHeight={90} minHeight={listView ? 40 : noListSelected ? 0 : 80}>
-      {listView ? (
+      <CurrencySearch
+        isOpen={isOpen}
+        onDismiss={onDismiss}
+        onCurrencySelect={handleCurrencySelect}
+        onChangeList={handleClickChangeList}
+        selectedCurrency={selectedCurrency}
+        otherSelectedCurrency={otherSelectedCurrency}
+        showCommonBases={showCommonBases}
+      />
+      
+      {/* {listView ? (
         <ListSelect onDismiss={onDismiss} onBack={handleClickBack} />
       ) : noListSelected ? (
         <ListIntroduction onSelectList={handleSelectListIntroduction} />
@@ -79,7 +89,7 @@ export default function CurrencySearchModal({
           otherSelectedCurrency={otherSelectedCurrency}
           showCommonBases={showCommonBases}
         />
-      )}
+      )} */}
     </Modal>
   )
 }

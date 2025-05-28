@@ -68,6 +68,26 @@ function useSwapCallArguments(
 
     const swapMethods = []
 
+    // const t = Router.swapCallParameters(trade, {
+    //       feeOnTransfer: false,
+    //       allowedSlippage: new Percent(JSBI.BigInt(allowedSlippage), BIPS_BASE),
+    //       recipient,
+    //       ttl: deadline
+    //     });
+
+    //     const newArgs = []
+    //     for (let i = 0; i < t.args[1].length; i++) {
+    //       if (t.args[1][i] == undefined) {
+    //         // newArgs.push(WBTC[chainId].address)
+    //         continue;
+    //       }
+    //       newArgs.push(t.args[1][i])
+    //     }
+
+    //     t.args[1] = newArgs;
+    //     swapMethods.push(t)
+
+
     switch (tradeVersion) {
       case Version.v2:
         swapMethods.push(
@@ -115,6 +135,7 @@ export function useSwapCallback(
   const { account, chainId, library } = useActiveWeb3React()
 
   const swapCalls = useSwapCallArguments(trade, allowedSlippage, deadline, recipientAddressOrName)
+  console.log(swapCalls)
 
   const addTransaction = useTransactionAdder()
 
@@ -145,7 +166,11 @@ export function useSwapCallback(
               contract
             } = call
             const options = !value || isZero(value) ? {} : { value }
-
+            console.log(args)
+            // const args2: any = [...args];
+            // args2[1][0] = WBTC[1].address;
+            // console.log({methodName})
+            // console.log({args})
             return contract.estimateGas[methodName](...args, options)
               .then(gasEstimate => {
                 return {
@@ -213,11 +238,10 @@ export function useSwapCallback(
             const withRecipient =
               recipient === account
                 ? base
-                : `${base} to ${
-                    recipientAddressOrName && isAddress(recipientAddressOrName)
-                      ? shortenAddress(recipientAddressOrName)
-                      : recipientAddressOrName
-                  }`
+                : `${base} to ${recipientAddressOrName && isAddress(recipientAddressOrName)
+                  ? shortenAddress(recipientAddressOrName)
+                  : recipientAddressOrName
+                }`
 
             const withVersion =
               tradeVersion === Version.v2 ? withRecipient : `${withRecipient} on ${(tradeVersion as any).toUpperCase()}`

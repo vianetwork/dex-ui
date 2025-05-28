@@ -1,8 +1,9 @@
-import { ChainId, Token } from '@uniswap/sdk'
+import { Token } from '@uniswap/sdk'
 import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { AppState } from '../index'
+import { ChainId, USDC, USDT } from '../../constants'
 
 type TagDetails = Tags[keyof Tags]
 export interface TagInfo extends TagDetails {
@@ -31,11 +32,29 @@ export type TokenAddressMap = Readonly<{ [chainId in ChainId]: Readonly<{ [token
  * An empty result, useful as a default.
  */
 const EMPTY_LIST: TokenAddressMap = {
-  [ChainId.KOVAN]: {},
-  [ChainId.RINKEBY]: {},
-  [ChainId.ROPSTEN]: {},
-  [ChainId.GÖRLI]: {},
-  [ChainId.MAINNET]: {}
+  [ChainId.TESTNET]: {
+    [USDT.address]: new WrappedTokenInfo(
+      {
+        chainId: ChainId.TESTNET,
+        address: USDT.address,
+        decimals: USDT.decimals,
+        symbol: USDT.symbol!,
+        name: USDT.name!
+      },
+      []
+    ),
+    [USDC.address]: new WrappedTokenInfo(
+      {
+        chainId: ChainId.TESTNET,
+        address: USDC.address,
+        decimals: USDC.decimals,
+        symbol: USDC.symbol!,
+        name: USDC.name!
+      },
+      []
+    )
+  },
+  [ChainId.MAINNET]: {},
 }
 
 const listCache: WeakMap<TokenList, TokenAddressMap> | null =
@@ -55,11 +74,11 @@ export function listToTokenMap(list: TokenList): TokenAddressMap {
           })
           ?.filter((x): x is TagInfo => Boolean(x)) ?? []
       const token = new WrappedTokenInfo(tokenInfo, tags)
-      if (tokenMap[token.chainId][token.address] !== undefined) throw Error('Duplicate tokens.')
+      if (tokenMap[token.chainId as any as ChainId][token.address] !== undefined) throw Error('Duplicate tokens.')
       return {
         ...tokenMap,
         [token.chainId]: {
-          ...tokenMap[token.chainId],
+          ...tokenMap[token.chainId as any as ChainId],
           [token.address]: token
         }
       }

@@ -1,8 +1,8 @@
-import { ChainId, Pair, Token } from '@uniswap/sdk'
+import { Pair, Token } from '@uniswap/sdk'
 import flatMap from 'lodash.flatmap'
 import { useCallback, useMemo } from 'react'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
-import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from '../../constants'
+import { BASES_TO_TRACK_LIQUIDITY_FOR, ChainId, PINNED_PAIRS } from '../../constants'
 
 import { useActiveWeb3React } from '../../hooks'
 import { useAllTokens } from '../../hooks/Tokens'
@@ -18,6 +18,7 @@ import {
   updateUserExpertMode,
   updateUserSlippageTolerance
 } from './actions'
+import { getZksyncPairAddress } from '../../utils/zksync'
 
 function serializeToken(token: Token): SerializedToken {
   return {
@@ -165,8 +166,11 @@ export function usePairAdder(): (pair: Pair) => void {
  * @param tokenA one of the two tokens
  * @param tokenB the other token
  */
-export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
-  return new Token(tokenA.chainId, Pair.getAddress(tokenA, tokenB), 18, 'UNI-V2', 'Uniswap V2')
+export function toV2LiquidityToken(chainId: ChainId, [tokenA, tokenB]: [Token, Token]): Token | undefined {
+  if (!tokenA || !tokenB) return undefined;
+  const [token0Address, token1Address] = BigInt(tokenA.address) < BigInt(tokenB.address)
+    ? [tokenA.address, tokenB.address] : [tokenB.address, tokenA.address];
+  return new Token(chainId as any, getZksyncPairAddress(chainId as any, token0Address, token1Address), 18, 'UNI-V2', 'Uniswap V2')
 }
 
 /**
@@ -184,22 +188,22 @@ export function useTrackedTokenPairs(): [Token, Token][] {
     () =>
       chainId
         ? flatMap(Object.keys(tokens), tokenAddress => {
-            const token = tokens[tokenAddress]
-            // for each token on the current chain,
-            return (
-              // loop though all bases on the current chain
-              (BASES_TO_TRACK_LIQUIDITY_FOR[chainId] ?? [])
-                // to construct pairs of the given token with each base
-                .map(base => {
-                  if (base.address === token.address) {
-                    return null
-                  } else {
-                    return [base, token]
-                  }
-                })
-                .filter((p): p is [Token, Token] => p !== null)
-            )
-          })
+          const token = tokens[tokenAddress]
+          // for each token on the current chain,
+          return (
+            // loop though all bases on the current chain
+            (BASES_TO_TRACK_LIQUIDITY_FOR[chainId] ?? [])
+              // to construct pairs of the given token with each base
+              .map(base => {
+                if (base.address === token.address) {
+                  return null
+                } else {
+                  return [base, token]
+                }
+              })
+              .filter((p): p is [Token, Token] => p !== null)
+          )
+        })
         : [],
     [tokens, chainId]
   )

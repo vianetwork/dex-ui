@@ -1,4 +1,4 @@
-import { TokenAmount, Pair, Currency } from '@uniswap/sdk'
+import { Currency, Pair, TokenAmount } from '@uniswap/sdk'
 import { useMemo } from 'react'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
 import { Interface } from '@ethersproject/abi'
@@ -6,6 +6,7 @@ import { useActiveWeb3React } from '../hooks'
 
 import { useMultipleContractSingleData } from '../state/multicall/hooks'
 import { wrappedCurrency } from '../utils/wrappedCurrency'
+import { getZksyncPairAddress } from '../utils/zksync'
 
 const PAIR_INTERFACE = new Interface(IUniswapV2PairABI)
 
@@ -31,7 +32,10 @@ export function usePairs(currencies: [Currency | undefined, Currency | undefined
   const pairAddresses = useMemo(
     () =>
       tokens.map(([tokenA, tokenB]) => {
-        return tokenA && tokenB && !tokenA.equals(tokenB) ? Pair.getAddress(tokenA, tokenB) : undefined
+        if (!tokenA || !tokenB) return undefined;
+        const [token0Address, token1Address] = BigInt(tokenA.address) < BigInt(tokenB.address)
+          ? [tokenA.address, tokenB.address] : [tokenB.address, tokenA.address];
+        return tokenA && tokenB && !tokenA.equals(tokenB) ? getZksyncPairAddress(chainId as any, token0Address, token1Address) : undefined
       }),
     [tokens]
   )

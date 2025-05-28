@@ -1,4 +1,4 @@
-import { JSBI, Pair, Percent } from '@uniswap/sdk'
+import { JSBI, Pair, Percent, Token } from '@uniswap/sdk'
 import { darken } from 'polished'
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'react-feather'
@@ -13,6 +13,7 @@ import { ExternalLink } from '../../theme'
 import { currencyId } from '../../utils/currencyId'
 import { unwrappedToken } from '../../utils/wrappedCurrency'
 import { ButtonSecondary } from '../Button'
+// import { CurrencyAmount, Token as Token2 } from '@uniswap/sdk-core'
 
 import Card, { GreyCard } from '../Card'
 import { AutoColumn } from '../Column'
@@ -20,6 +21,8 @@ import CurrencyLogo from '../CurrencyLogo'
 import DoubleCurrencyLogo from '../DoubleLogo'
 import { AutoRow, RowBetween, RowFixed } from '../Row'
 import { Dots } from '../swap/styleds'
+import { getZksyncPairAddress } from '../../utils/zksync'
+import { toV2LiquidityToken } from '../../state/user/hooks'
 
 export const FixedHeightRow = styled(RowBetween)`
   height: 24px;
@@ -45,20 +48,21 @@ export function MinimalPositionCard({ pair, showUnwrapped = false, border }: Pos
   const currency1 = showUnwrapped ? pair.token1 : unwrappedToken(pair.token1)
 
   const [showMore, setShowMore] = useState(false)
+  const liquidityToken = toV2LiquidityToken(pair?.chainId as any, [pair?.token0!, pair?.token1!]);
 
-  const userPoolBalance = useTokenBalance(account ?? undefined, pair.liquidityToken)
-  const totalPoolTokens = useTotalSupply(pair.liquidityToken)
+  const userPoolBalance = useTokenBalance(account ?? undefined, liquidityToken)
+  const totalPoolTokens = useTotalSupply(liquidityToken)
 
   const [token0Deposited, token1Deposited] =
     !!pair &&
-    !!totalPoolTokens &&
-    !!userPoolBalance &&
-    // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
-    JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
+      !!totalPoolTokens &&
+      !!userPoolBalance &&
+      // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
+      JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
       ? [
-          pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
-          pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false)
-        ]
+        pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
+        pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false)
+      ]
       : [undefined, undefined]
 
   return (
@@ -130,9 +134,11 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
   const currency1 = unwrappedToken(pair.token1)
 
   const [showMore, setShowMore] = useState(false)
-
-  const userPoolBalance = useTokenBalance(account ?? undefined, pair.liquidityToken)
-  const totalPoolTokens = useTotalSupply(pair.liquidityToken)
+  const [token0Address, token1Address] = BigInt(pair.token0.address) < BigInt(pair.token1.address)
+    ? [pair.token0.address, pair.token1.address] : [pair.token1.address, pair.token0.address];
+  const liquidityToken = new Token(pair.token0.chainId, getZksyncPairAddress(pair.token0.chainId as any, token0Address, token1Address), 18, "UNI-V2", "Uniswap V2")
+  const userPoolBalance = useTokenBalance(account ?? undefined, liquidityToken)
+  const totalPoolTokens = useTotalSupply(liquidityToken)
 
   const poolTokenPercentage =
     !!userPoolBalance && !!totalPoolTokens && JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
@@ -141,14 +147,14 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
 
   const [token0Deposited, token1Deposited] =
     !!pair &&
-    !!totalPoolTokens &&
-    !!userPoolBalance &&
-    // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
-    JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
+      !!totalPoolTokens &&
+      !!userPoolBalance &&
+      // this condition is a short-circuit in the case where useTokenBalance updates sooner than useTotalSupply
+      JSBI.greaterThanOrEqual(totalPoolTokens.raw, userPoolBalance.raw)
       ? [
-          pair.getLiquidityValue(pair.token0, totalPoolTokens, userPoolBalance, false),
-          pair.getLiquidityValue(pair.token1, totalPoolTokens, userPoolBalance, false)
-        ]
+        userPoolBalance?.multiply(pair.reserveOf(pair?.token0)).divide(totalPoolTokens),
+        userPoolBalance?.multiply(pair.reserveOf(pair?.token1)).divide(totalPoolTokens),
+      ]
       : [undefined, undefined]
 
   return (
@@ -223,11 +229,13 @@ export default function FullPositionCard({ pair, border }: PositionCardProps) {
               </Text>
             </FixedHeightRow>
 
-            <AutoRow justify="center" marginTop={'10px'}>
-              <ExternalLink href={`https://uniswap.info/pair/${pair.liquidityToken.address}`}>
-                View pool information ↗
-              </ExternalLink>
-            </AutoRow>
+            {false &&
+              <AutoRow justify="center" marginTop={'10px'}>
+                <ExternalLink href={`https://uniswap.info/pair/${liquidityToken.address}`}>
+                  View pool information ↗
+                </ExternalLink>
+              </AutoRow>
+            }
             <RowBetween marginTop="10px">
               <ButtonSecondary as={Link} to={`/add/${currencyId(currency0)}/${currencyId(currency1)}`} width="48%">
                 Add

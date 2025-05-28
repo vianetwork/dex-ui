@@ -44,9 +44,9 @@ class CustomizedBridge extends _Eip1193Bridge {
     }
     if (method === 'eth_chainId') {
       if (isCallbackForm) {
-        callback(null, { result: '0x4' })
+        callback(null, { result: '0x628f' }) // Hex for 25223 (testnet)
       } else {
-        return Promise.resolve('0x4')
+        return Promise.resolve('0x628f')
       }
     }
     try {
@@ -74,7 +74,7 @@ Cypress.Commands.overwrite('visit', (original, url, options) => {
     onBeforeLoad(win) {
       options && options.onBeforeLoad && options.onBeforeLoad(win)
       win.localStorage.clear()
-      const provider = new JsonRpcProvider('https://rinkeby.infura.io/v3/4bf032f2d38a4ed6bb975b80d6340847', 4)
+      const provider = new JsonRpcProvider('https://testnet-rpc-url-here', 25223)
       const signer = new Wallet(PRIVATE_KEY_TEST_NEVER_USE, provider)
       win.ethereum = new CustomizedBridge(signer, provider)
     }
