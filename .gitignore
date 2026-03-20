@@ -37,4 +37,3 @@ cypress/fixtures/example.json
 # Private documentation (not for public repo)
 private_docs/
 .env
-memory-bank/
