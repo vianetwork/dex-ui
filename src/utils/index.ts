@@ -4,9 +4,10 @@ import { AddressZero } from '@ethersproject/constants'
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers'
 import { BigNumber } from '@ethersproject/bignumber'
 import { abi as IUniswapV2Router02ABI } from '@uniswap/v2-periphery/build/IUniswapV2Router02.json'
-import { ChainId, ROUTER_ADDRESS } from '../constants'
+import { ChainId, getRouterAddress } from '../constants'
 import { JSBI, Percent, Token, CurrencyAmount, Currency, ETHER } from '@uniswap/sdk'
 import { TokenAddressMap } from '../state/lists/hooks'
+import { getViaDeployments } from '../via/deployments/getAddresses'
 
 // returns the checksummed address if the address is valid, otherwise returns false
 export function isAddress(value: any): string | false {
@@ -17,26 +18,38 @@ export function isAddress(value: any): string | false {
   }
 }
 
-const ETHERSCAN_PREFIXES: { [chainId in ChainId]: string } = {
-  [ChainId.MAINNET]: '',
-  [ChainId.TESTNET]: '',
+const ETHERSCAN_PREFIXES: { [chainId: number]: string } = {
+  1: '',
+  3: 'ropsten.',
+  4: 'rinkeby.',
+  5: 'goerli.',
+  42: 'kovan.'
 }
 
-export function getEtherscanLink(chainId: ChainId, data: string, type: 'transaction' | 'token' | 'address'): string {
-  const prefix = `https://${ETHERSCAN_PREFIXES[chainId] || ETHERSCAN_PREFIXES[chainId]}etherscan.io`
-
+function buildExplorerUrl(baseUrl: string, data: string, type: 'transaction' | 'token' | 'address'): string {
+  const normalizedBase = baseUrl.replace(/\/$/, '')
   switch (type) {
-    case 'transaction': {
-      return `${prefix}/tx/${data}`
-    }
-    case 'token': {
-      return `${prefix}/token/${data}`
-    }
+    case 'transaction':
+      return `${normalizedBase}/tx/${data}`
+    case 'token':
+      return `${normalizedBase}/token/${data}`
     case 'address':
-    default: {
-      return `${prefix}/address/${data}`
+    default:
+      return `${normalizedBase}/address/${data}`
+  }
+}
+
+export function getEtherscanLink(chainId: number, data: string, type: 'transaction' | 'token' | 'address'): string {
+  // Via networks use Blockscout (if configured in deployment artifact)
+  if (chainId === ChainId.TESTNET || chainId === ChainId.MAINNET) {
+    const viaExplorerBaseUrl = getViaDeployments(chainId).explorerBaseUrl
+    if (viaExplorerBaseUrl) {
+      return buildExplorerUrl(viaExplorerBaseUrl, data, type)
     }
   }
+
+  const prefix = `https://${ETHERSCAN_PREFIXES[chainId] ?? ''}etherscan.io`
+  return buildExplorerUrl(prefix, data, type)
 }
 
 // shorten the checksummed version of the input address to have 0x + 4 characters at start and end
@@ -88,8 +101,8 @@ export function getContract(address: string, ABI: any, library: Web3Provider, ac
 }
 
 // account is optional
-export function getRouterContract(_: number, library: Web3Provider, account?: string): Contract {
-  return getContract(ROUTER_ADDRESS, IUniswapV2Router02ABI, library, account)
+export function getRouterContract(chainId: number, library: Web3Provider, account?: string): Contract {
+  return getContract(getRouterAddress(chainId as ChainId), IUniswapV2Router02ABI, library, account)
 }
 
 export function escapeRegExp(string: string): string {

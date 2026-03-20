@@ -1,9 +1,11 @@
-import { CurrencyAmount, ETHER, Percent, Route, TokenAmount, Trade } from '@uniswap/sdk'
-import { DAI, USDC } from '../constants'
+import { CurrencyAmount, ETHER, Percent, Route, Token, TokenAmount, Trade } from '@uniswap/sdk'
 import { MockV1Pair } from '../data/V1'
 import v1SwapArguments from './v1SwapArguments'
 
 describe('v1SwapArguments', () => {
+  const USDC = new Token(1, '0xA0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6, 'USDC', 'USD Coin')
+  const DAI = new Token(1, '0x6B175474E89094C44Da98b954EedeAC495271d0F', 18, 'DAI', 'Dai Stablecoin')
+
   const USDC_WETH = new MockV1Pair('1000000', new TokenAmount(USDC, '1000000'))
   const DAI_WETH = new MockV1Pair('1000000', new TokenAmount(DAI, '1000000'))
 

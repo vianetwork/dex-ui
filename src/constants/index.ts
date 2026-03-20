@@ -2,8 +2,7 @@ import { JSBI, Percent, Token } from '@uniswap/sdk'
 import { AbstractConnector } from '@web3-react/abstract-connector'
 
 import { fortmatic, injected, portis, walletconnect, walletlink } from '../connectors'
-
-export const ROUTER_ADDRESS = '0x5fE58d975604E6aF62328d9E505181B94Fc0718C'
+import { getViaUniswapV2Addresses } from '../via/deployments/getAddresses'
 
 // a list of tokens by chain
 type ChainTokenList = {
@@ -16,13 +15,35 @@ export enum ChainId {
   TESTNET = 25223
 }
 
+export function getRouterAddress(chainId: ChainId): string {
+  return getViaUniswapV2Addresses(chainId).router02
+}
+
 export const USDT = new Token(ChainId.TESTNET as any, '0x65C899B5fb8Eb9ae4da51D67E1fc417c7CB7e964', 6, 'USDT', 'Tether USD')
 export const USDC = new Token(ChainId.TESTNET as any, '0x0a67078A35745947A37A552174aFe724D8180c25', 6, 'USDC', 'USDC')
 
 export const WBTC = {
-  [ChainId.MAINNET]: new Token(ChainId.MAINNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 18, 'WBTC', 'Wrapped Bitcoin'),
-  [ChainId.TESTNET]: new Token(ChainId.TESTNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 18, 'WBTC', 'Wrapped Bitcoin'),
-  "1": new Token(ChainId.TESTNET as any, '0xb76eD02Dea1ba444609602BE5D587c4bFfd67153', 18, 'WBTC', 'Wrapped Bitcoin')
+  [ChainId.MAINNET]: new Token(
+    ChainId.MAINNET as any,
+    getViaUniswapV2Addresses(ChainId.MAINNET).wbtc,
+    18,
+    'WBTC',
+    'Wrapped Bitcoin'
+  ),
+  [ChainId.TESTNET]: new Token(
+    ChainId.TESTNET as any,
+    getViaUniswapV2Addresses(ChainId.TESTNET).wbtc,
+    18,
+    'WBTC',
+    'Wrapped Bitcoin'
+  ),
+  '1': new Token(
+    ChainId.TESTNET as any,
+    getViaUniswapV2Addresses(ChainId.TESTNET).wbtc,
+    18,
+    'WBTC',
+    'Wrapped Bitcoin'
+  )
 }
 
 const WBTC_ONLY: ChainTokenList = {

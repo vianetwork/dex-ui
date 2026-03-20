@@ -33,3 +33,8 @@ cypress/videos
 cypress/screenshots
 cypress/fixtures/example.json
 .yarn
+
+# Private documentation (not for public repo)
+private_docs/
+.env
+memory-bank/
