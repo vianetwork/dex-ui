@@ -3,7 +3,7 @@ import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { AppState } from '../index'
-import { ChainId, USDC, USDT } from '../../constants'
+import { ChainId, USDC, USDT, VUSDC_Y } from '../../constants'
 
 type TagDetails = Tags[keyof Tags]
 export interface TagInfo extends TagDetails {
@@ -50,6 +50,16 @@ const EMPTY_LIST: TokenAddressMap = {
         decimals: USDC.decimals,
         symbol: USDC.symbol!,
         name: USDC.name!
+      },
+      []
+    ),
+    [VUSDC_Y.address]: new WrappedTokenInfo(
+      {
+        chainId: ChainId.TESTNET,
+        address: VUSDC_Y.address,
+        decimals: VUSDC_Y.decimals,
+        symbol: VUSDC_Y.symbol!,
+        name: VUSDC_Y.name!
       },
       []
     )

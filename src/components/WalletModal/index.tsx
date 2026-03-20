@@ -10,14 +10,17 @@ import Modal from '../Modal'
 import AccountDetails from '../AccountDetails'
 import PendingView from './PendingView'
 import Option from './Option'
-import { SUPPORTED_WALLETS } from '../../constants'
+import { SUPPORTED_WALLET_KEYS, SUPPORTED_WALLETS } from '../../constants'
 import { ExternalLink } from '../../theme'
 import MetamaskIcon from '../../assets/images/metamask.png'
 import { ReactComponent as Close } from '../../assets/images/x.svg'
 import { injected, fortmatic, portis } from '../../connectors'
+import { getSupportedWalletKey } from '../../constants'
 import { OVERLAY_READY } from '../../connectors/Fortmatic'
 import { WalletConnectConnector } from '@web3-react/walletconnect-connector'
 import { AbstractConnector } from '@web3-react/abstract-connector'
+import { clearWalletSession } from '../../state/wallet/sessionStorage'
+import { useWalletSession } from '../../hooks/useWalletSession'
 
 const CloseIcon = styled.div`
   position: absolute;
@@ -135,6 +138,7 @@ export default function WalletModal({
 
   const walletModalOpen = useWalletModalOpen()
   const toggleWalletModal = useWalletModalToggle()
+  const { connect } = useWalletSession()
 
   const previousAccount = usePrevious(account)
 
@@ -164,7 +168,9 @@ export default function WalletModal({
 
   const tryActivation = async (connector: AbstractConnector | undefined) => {
     let name = ''
-    Object.keys(SUPPORTED_WALLETS).map(key => {
+    const isMetaMask = !!(window.ethereum && window.ethereum.isMetaMask)
+    const walletKey = getSupportedWalletKey(connector, isMetaMask)
+    SUPPORTED_WALLET_KEYS.map(key => {
       if (connector === SUPPORTED_WALLETS[key].connector) {
         return (name = SUPPORTED_WALLETS[key].name)
       }
@@ -184,14 +190,21 @@ export default function WalletModal({
       connector.walletConnectProvider = undefined
     }
 
-    connector &&
-      activate(connector, undefined, true).catch(error => {
-        if (error instanceof UnsupportedChainIdError) {
-          activate(connector) // a little janky...can't use setError because the connector isn't set
-        } else {
-          setPendingError(true)
-        }
-      })
+    if (!connector) return
+
+    if (walletKey) {
+      connect(walletKey)
+    }
+
+    activate(connector, undefined, true).catch(error => {
+      if (error instanceof UnsupportedChainIdError) {
+        activate(connector) // a little janky...can't use setError because the connector isn't set
+        return
+      }
+
+      clearWalletSession()
+      setPendingError(true)
+    })
   }
 
   // close wallet modal if fortmatic modal is active
@@ -204,7 +217,7 @@ export default function WalletModal({
   // get wallets user can switch too, depending on device/browser
   function getOptions() {
     const isMetamask = window.ethereum && window.ethereum.isMetaMask
-    return Object.keys(SUPPORTED_WALLETS).map(key => {
+    return SUPPORTED_WALLET_KEYS.map(key => {
       const option = SUPPORTED_WALLETS[key]
       // check for mobile options
       if (isMobile) {

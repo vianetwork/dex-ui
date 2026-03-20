@@ -2,7 +2,7 @@ import { AbstractConnector } from '@web3-react/abstract-connector'
 import React from 'react'
 import styled from 'styled-components'
 import Option from './Option'
-import { SUPPORTED_WALLETS } from '../../constants'
+import { SUPPORTED_WALLET_KEYS, SUPPORTED_WALLETS } from '../../constants'
 import { injected } from '../../connectors'
 import { darken } from 'polished'
 import Loader from '../Loader'
@@ -100,7 +100,7 @@ export default function PendingView({
           )}
         </LoadingWrapper>
       </LoadingMessage>
-      {Object.keys(SUPPORTED_WALLETS).map(key => {
+      {SUPPORTED_WALLET_KEYS.map(key => {
         const option = SUPPORTED_WALLETS[key]
         if (option.connector === connector) {
           if (option.connector === injected) {
