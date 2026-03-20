@@ -21,6 +21,13 @@ export function getRouterAddress(chainId: ChainId): string {
 
 export const USDT = new Token(ChainId.TESTNET as any, '0x65C899B5fb8Eb9ae4da51D67E1fc417c7CB7e964', 6, 'USDT', 'Tether USD')
 export const USDC = new Token(ChainId.TESTNET as any, '0x0a67078A35745947A37A552174aFe724D8180c25', 6, 'USDC', 'USDC')
+export const VUSDC_Y = new Token(
+  ChainId.TESTNET as any,
+  '0x327d741E500E11Ab69F9D1A496A0ab4F934fA463',
+  6,
+  'vUSDC-Y',
+  'Via L2 Vault Token Yield'
+)
 
 export const WBTC = {
   [ChainId.MAINNET]: new Token(
@@ -68,18 +75,21 @@ export const CUSTOM_BASES: { [chainId in ChainId]?: { [tokenAddress: string]: To
 // used for display in the default list when adding liquidity
 export const SUGGESTED_BASES: ChainTokenList = {
   ...WBTC_ONLY,
-  [ChainId.MAINNET]: [...WBTC_ONLY[ChainId.MAINNET], USDT]
+  [ChainId.MAINNET]: [...WBTC_ONLY[ChainId.MAINNET], USDT],
+  [ChainId.TESTNET]: [...WBTC_ONLY[ChainId.TESTNET], USDC, USDT, VUSDC_Y]
 }
 
 // used to construct the list of all pairs we consider by default in the frontend
 export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
   ...WBTC_ONLY,
-  [ChainId.MAINNET]: [...WBTC_ONLY[ChainId.MAINNET], USDT, USDC]
+  [ChainId.MAINNET]: [...WBTC_ONLY[ChainId.MAINNET], USDT, USDC],
+  [ChainId.TESTNET]: [...WBTC_ONLY[ChainId.TESTNET], USDC, USDT, VUSDC_Y]
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
   [ChainId.TESTNET]: [
     [USDC, USDT],
+    [USDC, VUSDC_Y],
   ]
 }
 
@@ -95,7 +105,26 @@ export interface WalletInfo {
   mobileOnly?: true
 }
 
-export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
+export type SupportedWalletKey =
+  | 'INJECTED'
+  | 'METAMASK'
+  | 'WALLET_CONNECT'
+  | 'WALLET_LINK'
+  | 'COINBASE_LINK'
+  | 'FORTMATIC'
+  | 'Portis'
+
+export const SUPPORTED_WALLET_KEYS: SupportedWalletKey[] = [
+  'INJECTED',
+  'METAMASK',
+  'WALLET_CONNECT',
+  'WALLET_LINK',
+  'COINBASE_LINK',
+  'FORTMATIC',
+  'Portis'
+]
+
+export const SUPPORTED_WALLETS: Record<SupportedWalletKey, WalletInfo> = {
   INJECTED: {
     connector: injected,
     name: 'Injected',
@@ -157,6 +186,19 @@ export const SUPPORTED_WALLETS: { [key: string]: WalletInfo } = {
     color: '#4A6C9B',
     mobile: true
   }
+}
+
+export function getSupportedWalletKey(connector: AbstractConnector | undefined, isMetaMask: boolean): SupportedWalletKey | null {
+  if (!connector) return null
+
+  for (const walletKey of SUPPORTED_WALLET_KEYS) {
+    const supportedWallet = SUPPORTED_WALLETS[walletKey]
+    if (supportedWallet.connector !== connector) continue
+    if (connector === injected && isMetaMask !== (walletKey === 'METAMASK')) continue
+    return walletKey
+  }
+
+  return null
 }
 
 export const NetworkContextName = 'NETWORK'
