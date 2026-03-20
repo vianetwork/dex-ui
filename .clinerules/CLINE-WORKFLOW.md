@@ -15,7 +15,7 @@ Before doing any work, read the repo guidance in this order:
 
 - `.clinerules/code-style.md` - TypeScript, React, naming, comments, and formatting rules
 - `.clinerules/implementation-docs.md` - planning and execution order guidance
-- `AGENTS.md` - repo-specific architecture and wallet/session boundaries
+- `AGENTS.md` - concise repo-specific routing and non-negotiable rules
 
 Then read the Memory Bank:
 
@@ -28,10 +28,17 @@ Then read the Memory Bank:
 
 ## 2) Read subsystem-specific context when relevant
 
-Read the files that match the area you are changing instead of guessing.
+Read the docs and files that match the area you are changing instead of
+guessing. Do not read all of `docs/engineering/` by default.
+
+### Architecture and file ownership
+
+- `docs/engineering/architecture-overview.md`
+- `docs/engineering/code-change-guardrails.md`
 
 ### Wallet and session lifecycle
 
+- `docs/engineering/wallet-session-rules.md`
 - `src/hooks/useWalletSession.ts`
 - `src/hooks/index.ts`
 - `src/components/Web3ReactManager/index.tsx`
@@ -43,6 +50,7 @@ Read the files that match the area you are changing instead of guessing.
 
 ### Via deployment artifacts and chain configuration
 
+- `docs/engineering/via-deployment-constraints.md`
 - `src/via/deployments/`
 - `src/constants/index.ts`
 - `src/constants/multicall/`
@@ -51,12 +59,14 @@ Read the files that match the area you are changing instead of guessing.
 
 ### Token lists and asset configuration
 
+- `docs/engineering/via-deployment-constraints.md`
 - `src/state/lists/hooks.ts`
 - `src/constants/lists.ts`
 - `src/constants/index.ts`
 
 ### Swap and liquidity flows
 
+- `docs/engineering/code-change-guardrails.md`
 - `src/hooks/useSwapCallback.ts`
 - `src/hooks/useApproveCallback.ts`
 - `src/hooks/useWrapCallback.ts`
@@ -67,6 +77,7 @@ Read the files that match the area you are changing instead of guessing.
 
 ### Shared state and app behavior
 
+- `docs/engineering/state-management-boundaries.md`
 - `src/state/`
 - `src/pages/App.tsx`
 - `src/pages/AppBody.tsx`
@@ -103,6 +114,7 @@ In Act mode:
 
 Run the smallest relevant verification step for what you changed:
 
+- `docs/engineering/verification-checklist.md`
 - `yarn lint`
 - `source /home/romano/.nvm/nvm.sh && nvm use 20 && yarn tsc --noEmit`
 - `yarn test`
@@ -129,3 +141,8 @@ When updating it, focus especially on:
 - `memory-bank/activeContext.md` for current decisions and next steps
 - `memory-bank/progress.md` for what changed and what remains
 - `memory-bank/techContext.md` when tooling or verification commands change
+
+If repo guidance structure changes, keep these aligned too:
+
+- `AGENTS.md`
+- `docs/engineering/`
